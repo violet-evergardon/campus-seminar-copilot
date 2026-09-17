@@ -1,0 +1,32 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: sqlite:////data/campus_seminar.db
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      RETRIEVAL_PROVIDER: ${RETRIEVAL_PROVIDER:-sqlite}
+      MILVUS_URI: ${MILVUS_URI:-}
+    volumes:
+      - campus-data:/data
+    ports: ["8000:8000"]
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE: http://localhost:8000
+    depends_on: [backend]
+    ports: ["5173:80"]
+  milvus:
+    image: milvusdb/milvus:v2.5.14
+    profiles: ["milvus"]
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_USE_EMBED: "true"
+      COMMON_STORAGETYPE: local
+    volumes:
+      - milvus-data:/var/lib/milvus
+    ports: ["19530:19530", "9091:9091"]
+volumes:
+  campus-data:
+  milvus-data:
+

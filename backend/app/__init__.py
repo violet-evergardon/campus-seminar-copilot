@@ -1,0 +1,2 @@
+"""Campus Seminar Copilot backend."""
+
